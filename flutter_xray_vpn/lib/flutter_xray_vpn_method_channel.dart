@@ -3,15 +3,17 @@ import 'package:flutter/services.dart';
 
 import 'flutter_xray_vpn_platform_interface.dart';
 
-/// An implementation of [FlutterXrayVpnPlatform] that uses method channels.
 class MethodChannelFlutterXrayVpn extends FlutterXrayVpnPlatform {
-  /// The method channel used to interact with the native platform.
   @visibleForTesting
   final methodChannel = const MethodChannel('flutter_xray_vpn');
 
   @override
-  Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
-    return version;
+  Future<void> startVpn(String configJson) async {
+    await methodChannel.invokeMethod<void>('startVpn', {'configJson': configJson});
+  }
+
+  @override
+  Future<void> stopVpn() async {
+    await methodChannel.invokeMethod<void>('stopVpn');
   }
 }
