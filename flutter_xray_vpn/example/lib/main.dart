@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:flutter_xray_vpn/flutter_xray_vpn.dart';
 
 void main() {
@@ -16,35 +13,50 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
   final _flutterXrayVpnPlugin = FlutterXrayVpn();
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
+  // A sample Xray configuration. 
+  // This config uses a 'freedom' outbound, which means it will just forward the traffic.
+  // It's useful for testing the VPN setup without a real server.
+  final String testConfig = '''
+  {
+    "inbounds": [
+      {
+        "port": 10809,
+        "listen": "127.0.0.1",
+        "protocol": "socks",
+        "settings": {
+          "auth": "noauth",
+          "udp": true,
+          "ip": "127.0.0.1"
+        }
+      }
+    ],
+    "outbounds": [
+      {
+        "protocol": "freedom",
+        "settings": {}
+      }
+    ]
+  }
+  ''';
+
+  Future<void> _startVpn() async {
+    try {
+      await _flutterXrayVpnPlugin.startVpn(testConfig);
+    } catch (e) {
+      // Handle error
+      print('Failed to start VPN: $e');
+    }
   }
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
+  Future<void> _stopVpn() async {
     try {
-      platformVersion =
-          await _flutterXrayVpnPlugin.getPlatformVersion() ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      await _flutterXrayVpnPlugin.stopVpn();
+    } catch (e) {
+      // Handle error
+      print('Failed to stop VPN: $e');
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
@@ -52,10 +64,23 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Xray VPN Plugin Example'),
         ),
         body: Center(
-          child: Text('Running on: $_platformVersion\n'),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: _startVpn,
+                child: const Text('Start VPN'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _stopVpn,
+                child: const Text('Stop VPN'),
+              ),
+            ],
+          ),
         ),
       ),
     );
