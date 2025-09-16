@@ -24,3 +24,5 @@ plugins {
 }
 
 include(":app")
+include(":xray_wrapper")
+project(":xray_wrapper").projectDir = file("../../xray_wrapper")

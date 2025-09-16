@@ -1,0 +1,10 @@
+apply plugin: 'com.android.library'
+
+android {
+    namespace 'com.example.xray_wrapper'
+    compileSdkVersion 34
+
+    defaultConfig {
+        minSdkVersion 21
+    }
+}

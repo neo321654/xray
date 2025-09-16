@@ -1,1 +1,4 @@
 rootProject.name = 'flutter_xray_vpn'
+
+include ':xray_wrapper'
+project(':xray_wrapper').projectDir = new File(rootProject.projectDir, '../xray_wrapper')
